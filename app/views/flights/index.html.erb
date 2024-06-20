@@ -1,0 +1,56 @@
+<h1>Flights</h1>
+
+<%= form_with model: @flights, method: :get, url: flights_path do |form| %>
+  <%= form.collection_select :departure_airport, Airport.all, :id, :code %>
+  <%= form.collection_select :arrival_airport, Airport.all, :id, :code %>
+  <%= form.collection_select :start, Flight.all, :id, :start %>
+  <%= form.label :"Number of passengers :" %>
+  <%= form.select :passengers, (1..4) %>
+  <%= form.submit "Search" %>
+  <%= link_to "back to main", root_path %>
+<% end %>
+<hr>
+
+
+
+<% if params[:flight].present? %>
+  <%if @flights.empty? %>
+    <% departure_airport = Airport.find_by(id: params[:flight]["departure_airport"]) %>
+    <% arrival_airport = Airport.find_by(id: params[:flight]["arrival_airport"]) %>
+    No flights found for Departure Airport: <%= departure_airport.code %>, Arrival Airport: <%= arrival_airport.code %>
+  <% else %>
+    <%= form_with model: @flights, method: :get, url: new_booking_path do |form| %>
+      <% @flights.each do |flight| %>
+        <p> <%= form.label "flight_#{flight.id}", "Departure Airport: #{flight.departure_airport.code}" %></p>
+        <p> <%= form.label "flight_#{flight.id}", "Arrival Airport: #{flight.arrival_airport.code}" %></p>
+        <p> <%= form.label "flight_#{flight.id}", "Scheduled: #{flight.start}" %></p>
+        <p> <%= form.label "flight_#{flight.id}", "Flight Duration: #{flight.formatted_flight_duration}" %></p>
+        <p> <%= form.radio_button :selected_flight_id, flight.id, id: "flight_#{flight.id}" %></p>
+            <%= form.hidden_field :passengers, value: params[:flight]["passengers"] %>
+            <%= form.submit "Confirm selected" %>
+        <hr>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+
+<% @flights.group_by(&:departure_airport).each do |departure_airport, flights| %>
+  <div style="width: 33.33%; float: left;">
+    <h2><%= departure_airport.code %></h2>
+    <% flights.each do |flight| %>
+      <p><strong>Departure Airport:</strong> <%= flight.departure_airport.code %></p>
+      <p><strong>Arrival Airport:</strong> <%= flight.arrival_airport.code %></p>
+      <p><strong>Scheduled:</strong> <%= flight.start %></p>
+      <p><strong>Flight Duration:</strong> <%= flight.formatted_flight_duration %></p>
+      <hr>
+    <% end %>
+  </div>
+<% end %>
+
+
+
+<% end %>
+
+
+
+

@@ -1,0 +1,19 @@
+<p><strong>Departure Airport:</strong> <%= @flight.departure_airport.code %></p>
+<p><strong>Arrival Airport:</strong> <%= @flight.arrival_airport.code %></p>
+<p>Scheduled: <%= @flight.start %></p>
+<p>Flight Duration: <%= @flight.formatted_flight_duration %></p>
+ 
+
+ <%= form_with model: @booking, url: bookings_path do |form| %>
+  <%= form.hidden_field :flight_id, value: @flight.id %>
+
+    <%= form.fields_for :passengers do |passenger_builder| %>
+      <%= passenger_builder.label :name %>
+      <%= passenger_builder.text_field :name, value: "placeholder text" %>
+      <%= passenger_builder.label :email %>
+      <%= passenger_builder.email_field :email, value: "placeholder@email.com" %>
+      <br>
+    <% end %>
+  <%= form.submit %>
+<% end %>
+
